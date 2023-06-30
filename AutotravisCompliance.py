@@ -126,6 +126,7 @@ parser = argparse.ArgumentParser(description='Autotravis for compliance using CS
 parser.add_argument('-d', '--dir', required=True, help='Please specify the directory with the csv files with -d')
 args = parser.parse_args()
 filepath = args.dir
-### columns are set for Nessus Pro, not Security Center, SC has different names for most items below
+### Only send columns you want to combine_csvs() - change if needed
+### TODO: columns are set for Nessus Pro, not Security Center, SC has different names for most items below
 columns = ['Plugin ID', 'Risk', 'Description', 'Solution', 'Name', 'Host']
 combine_csvs(filepath, columns)
