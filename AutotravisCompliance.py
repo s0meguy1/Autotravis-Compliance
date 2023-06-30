@@ -12,6 +12,7 @@ import re
 def combine_csvs(dir_path, cms):
     if os.path.isfile('/tmp/output.csv'):
         os.remove('/tmp/output.csv')
+    # TODO: Maybe set "SC detected" here and new list if SC is detected, which would change cms...
     df = pd.DataFrame()
     for i, file_name in enumerate(os.listdir(dir_path)):
         if file_name.endswith('csv'):
@@ -21,16 +22,18 @@ def combine_csvs(dir_path, cms):
                 temp_df = temp_df[cms]
                 df = df.append(temp_df, ignore_index=True)
             except:
+                # If SC csv is injected, will fail here, this is made for bad csv's
                 print(f"key error raised for file: {file_path}")
     df.to_csv('/tmp/output.csv', index=False)
     get_compliance('/tmp/output.csv')
 
 def get_compliance(file):
+    # Create xlxs document:
     spreadsheetName = "SAR.for.travis.xlxs"
     spreadsheetloc = str(os.getcwd()) + "/" + spreadsheetName
     workbook = xlsxwriter.Workbook(spreadsheetloc)
     worksheet = workbook.add_worksheet()
-    ### Create raw template ###
+    ### Create raw report template ###
     # Full black cells:
     blackcell = workbook.add_format()
     blackcell.set_pattern(1)
@@ -85,9 +88,9 @@ def get_compliance(file):
     worksheet.write('K1', 'Mitigated Onsite?', arialbold)
     # Black Cells
     worksheet.set_column('H:H', 5.14, arialbold)
-    # testcount is used to count how many finding rows there are based on Chris's unique sort of plugins, so that it can append to the proper cell row
-########## pandas stuff: #########
+########## pandas stuff - actual sorting: #########
     df = pd.read_csv(str(file))
+    # This is set for Nessus Pro (FAILED), in SC its "High" instead of FAILED - need to add SC support
     failedItems = df[df['Risk'] == 'FAILED']
     try:
         failedItems['Host'] = failedItems.groupby('Solution')['Host'].transform(lambda x: ','.join(x.unique()))
@@ -123,6 +126,6 @@ parser = argparse.ArgumentParser(description='Autotravis for compliance using CS
 parser.add_argument('-d', '--dir', required=True, help='Please specify the directory with the csv files with -d')
 args = parser.parse_args()
 filepath = args.dir
-
+### columns are set for Nessus Pro, not Security Center, SC has different names for most items below
 columns = ['Plugin ID', 'Risk', 'Description', 'Solution', 'Name', 'Host']
 combine_csvs(filepath, columns)
