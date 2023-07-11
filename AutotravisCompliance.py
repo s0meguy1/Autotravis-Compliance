@@ -97,8 +97,8 @@ def get_compliance(file):
         failedItems['Host'] = failedItems.groupby('DescriptionGroup')['Host'].transform(lambda x: ','.join(x.unique()))
     except:
         print(f"Failed to parse file: {str(file)}")
-    failedItems = failedItems.drop_duplicates(subset='Solution')
-    sorteditems = failedItems.sort_values('Solution')
+    failedItems = failedItems.drop_duplicates(subset='DescriptionGroup')
+    sorteditems = failedItems.sort_values('DescriptionGroup')
     testcount = 1
     for index, row in sorteditems.iterrows():
 #################################
