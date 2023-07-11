@@ -18,7 +18,7 @@ def combine_csvs(dir_path, cms):
         if file_name.endswith('csv'):
             file_path = os.path.join(dir_path, file_name)
             try:
-                temp_df = pd.read_csv(file_path)
+                temp_df = pd.read_csv(file_path, dtype=str)
                 temp_df = temp_df[cms]
                 df = df.append(temp_df, ignore_index=True)
             except:
