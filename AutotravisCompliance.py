@@ -29,7 +29,7 @@ def combine_csvs(dir_path, cms):
 
 def get_compliance(file):
     # Create xlxs document:
-    spreadsheetName = "SAR.for.travis.xlxs"
+    spreadsheetName = "SAR.for.travis.compliance.xlxs"
     spreadsheetloc = str(os.getcwd()) + "/" + spreadsheetName
     workbook = xlsxwriter.Workbook(spreadsheetloc)
     worksheet = workbook.add_worksheet()
