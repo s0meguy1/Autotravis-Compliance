@@ -92,8 +92,9 @@ def get_compliance(file):
     df = pd.read_csv(str(file))
     # This is set for Nessus Pro (FAILED), in SC its "High" instead of FAILED - need to add SC support
     failedItems = df[df['Risk'] == 'FAILED']
+    failedItems['DescriptionGroup'] = failedItems['Description'].str.extract(r'"(.*?)"')
     try:
-        failedItems['Host'] = failedItems.groupby('Solution')['Host'].transform(lambda x: ','.join(x.unique()))
+        failedItems['Host'] = failedItems.groupby('DescriptionGroup')['Host'].transform(lambda x: ','.join(x.unique()))
     except:
         print(f"Failed to parse file: {str(file)}")
     failedItems = failedItems.drop_duplicates(subset='Solution')
