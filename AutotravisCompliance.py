@@ -23,6 +23,7 @@ def combine_csvs(dir_path, cms):
                 df = df.append(temp_df, ignore_index=True)
             except:
                 # If SC csv is injected, will fail here, this is made for bad csv's
+                # May need to add a new CMS for Security Center here, followed by another try
                 print(f"key error raised for file: {file_path}")
     df.to_csv('/tmp/output.csv', index=False)
     get_compliance('/tmp/output.csv')
