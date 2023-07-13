@@ -19,7 +19,7 @@ def combine_csvs(dir_path, cms):
             file_path = os.path.join(dir_path, file_name)
             try:
                 temp_df = pd.read_csv(file_path, dtype=str, usecols=cms)
-                temp_df = temp_df[cms]
+#                temp_df = temp_df[cms]
                 df = df.append(temp_df, ignore_index=True)
             except:
                 # If SC csv is injected, will fail here, this is made for bad csv's
