@@ -10,23 +10,24 @@ import re
 # Add Enclave/Plane option
 # Add Finding added by option
 def combine_csvs(dir_path, cms):
-    if os.path.isfile('/tmp/output.csv'):
-        os.remove('/tmp/output.csv')
+
+    if os.path.isfile('output.csv'):
+        os.remove('output.csv')
     # TODO: Maybe set "SC detected" here and new list if SC is detected, which would change cms...
     df = pd.DataFrame()
     for i, file_name in enumerate(os.listdir(dir_path)):
         if file_name.endswith('csv'):
             file_path = os.path.join(dir_path, file_name)
             try:
-                temp_df = pd.read_csv(file_path, dtype=str, usecols=cms)
+                df = pd.read_csv(file_path, dtype=str, usecols=cms)
 #                temp_df = temp_df[cms]
-                df = df.append(temp_df, ignore_index=True)
+                #df = df.append(temp_df)
             except:
                 # If SC csv is injected, will fail here, this is made for bad csv's
                 # May need to add a new CMS for Security Center here, followed by another try
                 print(f"key error raised for file: {file_path}")
-    df.to_csv('/tmp/output.csv', index=False)
-    get_compliance('/tmp/output.csv')
+    df.to_csv('output.csv', index=False)
+    get_compliance('output.csv')
 
 def get_compliance(file):
     # Create xlxs document:
@@ -41,7 +42,7 @@ def get_compliance(file):
     blackcell.set_bg_color('black')
     # Used for first row:
     arialbold = workbook.add_format()
-    arialbold.set_font_name()
+    arialbold.set_font_name('Calibri')
     arialbold.set_font_size(11)
     arialbold.set_bold(True)
     arialbold.set_align('bottom')
@@ -89,7 +90,8 @@ def get_compliance(file):
     worksheet.write('K1', 'Mitigated Onsite?', arialbold)
     # Black Cells
     worksheet.set_column('H:H', 5.14, arialbold)
-########## pandas stuff - actual sorting: #########
+    ########## pandas stuff - actual sorting: #########
+    print("file_name", file)
     df = pd.read_csv(str(file))
     # This is set for Nessus Pro (FAILED), in SC its "High" instead of FAILED - need to add SC support
     failedItems = df[df['Risk'] == 'FAILED']
@@ -102,7 +104,7 @@ def get_compliance(file):
     sorteditems = failedItems.sort_values('DescriptionGroup')
     testcount = 1
     for index, row in sorteditems.iterrows():
-#################################
+    #################################
         testcount = testcount + 1
         betterdes = row['Description'].split('\n')[0]
         try:
@@ -132,3 +134,4 @@ filepath = args.dir
 ### TODO: columns are set for Nessus Pro, not Security Center, SC has different names for most items below
 columns = ['Plugin ID', 'Risk', 'Description', 'Solution', 'Name', 'Host']
 combine_csvs(filepath, columns)
+
