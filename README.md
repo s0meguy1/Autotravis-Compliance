@@ -8,8 +8,12 @@ This tool chews through a directory of csv compliance reports, sorts by unique i
 ## Usage
 python3 AutotravisCompliance.py -d ./DIR-WITH-CSVs
 
-The tool then outputs to one file, SAR.for.travis.xlxs
+The tool then outputs to one file, SAR.for.travis.compliance.xls
+
+## Dependencies
+pip install XlsxWriter
+pip install pandas
+
 
 ## But why?
-
 Our boss would get constantly changing requirements from the client, which would force us to spend hours re-analyzing the data and re-formatting. This makes it possible in seconds
