@@ -26,6 +26,7 @@ def combine_csvs(dir_path, cms):
                 # If SC csv is injected, will fail here, this is made for bad csv's
                 # May need to add a new CMS for Security Center here, followed by another try
                 print(f"key error raised for file: {file_path}")
+    # df = pd.read_csv(file, dtype=str, usecols=cms) for file in file_paths
     df.to_csv('output.csv', index=False)
     get_compliance('output.csv')
 
@@ -91,7 +92,6 @@ def get_compliance(file):
     # Black Cells
     worksheet.set_column('H:H', 5.14, arialbold)
     ########## pandas stuff - actual sorting: #########
-    print("file_name", file)
     df = pd.read_csv(str(file))
     # This is set for Nessus Pro (FAILED), in SC its "High" instead of FAILED - need to add SC support
     failedItems = df[df['Risk'] == 'FAILED']
@@ -124,7 +124,7 @@ def get_compliance(file):
         worksheet.write('A' + str(testcount), '', blackcell)
         worksheet.write('H' + str(testcount), 5.14, blackcell)
     workbook.close()
-    print("Completed - XLSX Report ->", spreadsheetName)
+    print("Completed - XLS Report ->", spreadsheetName)
 
 parser = argparse.ArgumentParser(description='Autotravis for compliance using CSVs')
 parser.add_argument('-d', '--dir', required=True, help='Please specify the directory with the csv files with -d')
