@@ -22,6 +22,8 @@ def combine_csvs(dir_path, cms):
             file_path.append(os.path.join(dir_path, file_name))
 
     df = pd.concat(map(pd.read_csv, file_path))
+    df_filtered = pd.DataFrame(df,
+                         columns = cms)
 
     # df = pd.read_csv(file_path, dtype=str, usecols=cms)
     df.to_csv('output.csv', index=False)
@@ -112,7 +114,7 @@ def get_compliance(file):
         editedhosts = row['Host'].replace(',','\n')
         worksheet.write('B' + str(testcount), editedhosts, normaltext)
         worksheet.write('C' + str(testcount), "Nessus PluginID="+str(row['Plugin ID']), normaltext)
-        worksheet.write('D' + str(testcount), "High", normaltext)
+        worksheet.write('D' + str(testcount), str(row['Risk']), normaltext)
         for line in betterdes2:
             worksheet.write('E' + str(testcount), str(line), normaltext)
         worksheet.write('F' + str(testcount), str(row['Description']), normaltext)
