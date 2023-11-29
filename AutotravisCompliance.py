@@ -5,6 +5,7 @@ from os import system
 import pandas as pd
 import argparse
 import re
+
 # TODO:
 #This version has a bug when database schema for column nessus_host_id is not unique, it will add those IP's as findings incorrectly
 # Add Enclave/Plane option
@@ -15,24 +16,20 @@ def combine_csvs(dir_path, cms):
         os.remove('output.csv')
     # TODO: Maybe set "SC detected" here and new list if SC is detected, which would change cms...
     df = pd.DataFrame()
+    file_path = []
     for i, file_name in enumerate(os.listdir(dir_path)):
         if file_name.endswith('csv'):
-            file_path = os.path.join(dir_path, file_name)
-            try:
-                df = pd.read_csv(file_path, dtype=str, usecols=cms)
-#                temp_df = temp_df[cms]
-                #df = df.append(temp_df)
-            except:
-                # If SC csv is injected, will fail here, this is made for bad csv's
-                # May need to add a new CMS for Security Center here, followed by another try
-                print(f"key error raised for file: {file_path}")
-    # df = pd.read_csv(file, dtype=str, usecols=cms) for file in file_paths
+            file_path.append(os.path.join(dir_path, file_name))
+
+    df = pd.concat(map(pd.read_csv, file_path))
+
+    # df = pd.read_csv(file_path, dtype=str, usecols=cms)
     df.to_csv('output.csv', index=False)
     get_compliance('output.csv')
 
 def get_compliance(file):
     # Create xlxs document:
-    spreadsheetName = "SAR.for.travis.compliance.xls"
+    spreadsheetName = "SAR.for.travis.compliance.xlsx"
     spreadsheetloc = str(os.getcwd()) + "/" + spreadsheetName
     workbook = xlsxwriter.Workbook(spreadsheetloc)
     worksheet = workbook.add_worksheet()
@@ -124,7 +121,7 @@ def get_compliance(file):
         worksheet.write('A' + str(testcount), '', blackcell)
         worksheet.write('H' + str(testcount), 5.14, blackcell)
     workbook.close()
-    print("Completed - XLS Report ->", spreadsheetName)
+    print("Completed - XLSX Report ->", spreadsheetName)
 
 parser = argparse.ArgumentParser(description='Autotravis for compliance using CSVs')
 parser.add_argument('-d', '--dir', required=True, help='Please specify the directory with the csv files with -d')
