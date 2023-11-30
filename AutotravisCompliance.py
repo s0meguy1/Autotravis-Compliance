@@ -117,7 +117,13 @@ def get_compliance(file):
         worksheet.write('D' + str(testcount), str(row['Risk']), normaltext)
         for line in betterdes2:
             worksheet.write('E' + str(testcount), str(line)[:14], normaltext)
-        worksheet.write('F' + str(testcount), str(row['Description']), normaltext)
+        try: 
+            #removes duplicat host name and solution fields from description.
+            evenBetterDescription = str(row['Description']).split("FAILED]\n\n",1)[1].split("Solution")[0]
+            worksheet.write('F' + str(testcount), evenBetterDescription, normaltext)
+    
+        except: 
+            worksheet.write('F' + str(testcount), str(row['Description']), normaltext)
         worksheet.write('G' + str(testcount), '', normaltext)
         worksheet.write_rich_string('G' + str(testcount), normalBOLDtext, 'Certifier Comments:', normaltext, "\nNone", normalBOLDtext, "\nRecommendation:\n", normaltext, str(row['Solution']))
         worksheet.write('A' + str(testcount), '', blackcell)
