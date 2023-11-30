@@ -85,7 +85,7 @@ def get_compliance(file):
     worksheet.set_column('I:I', 10.86, arialbold)
     worksheet.write('I1', 'Enclave/Plane', arialbold)
     worksheet.set_column('J:J', 22.86, arialbold)
-    worksheet.write('J1', 'Fidning added by', arialbold)
+    worksheet.write('J1', 'Finding added by', arialbold)
     worksheet.set_column('K:K', 19.14, arialbold)
     worksheet.write('K1', 'Mitigated Onsite?', arialbold)
     # Black Cells
