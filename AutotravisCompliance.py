@@ -116,7 +116,7 @@ def get_compliance(file):
         worksheet.write('C' + str(testcount), "Nessus PluginID="+str(row['Plugin ID']), normaltext)
         worksheet.write('D' + str(testcount), str(row['Risk']), normaltext)
         for line in betterdes2:
-            worksheet.write('E' + str(testcount), str(line), normaltext)
+            worksheet.write('E' + str(testcount), str(line)[:14], normaltext)
         worksheet.write('F' + str(testcount), str(row['Description']), normaltext)
         worksheet.write('G' + str(testcount), '', normaltext)
         worksheet.write_rich_string('G' + str(testcount), normalBOLDtext, 'Certifier Comments:', normaltext, "\nNone", normalBOLDtext, "\nRecommendation:\n", normaltext, str(row['Solution']))
