@@ -30,11 +30,11 @@ def combine_csvs(dir_path, cms):
 
     #read in csv and txt file(s)
     if file_txt_path:
+        print("Compliance File Path")
         df = pd.concat(map(pd.read_csv, file_csv_path))
         df.to_csv('output.csv', index=False)
         df_txt = pd.concat(map(pd.read_csv, file_txt_path))
         df_txt.to_csv('output.txt', index=False)
-        print("Compliance File Path")
         get_compliance('output.csv',"output.txt", dir_path)
     else:
         print("Config File Path")
@@ -81,7 +81,6 @@ def compute_config_path(total, failedItems):
 
     with alive_bar(total) as bar:  # your expected total
         for index, row in failedItems.iterrows():
-            print(row['Description'])
             try:
                 category_string = str(row['Description']).split("CAT|",1)[1].split(",")[0]
             except:
