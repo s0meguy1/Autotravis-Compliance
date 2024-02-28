@@ -50,7 +50,7 @@ format_gray = workbook.add_format({'bg_color': 'gray',
                                     'font_name': 'Calibri',
                                     'font_size': 11,
                                     'bold': True,
-                                    'align': 'bottom',
+                                    'align': 'Center',
                                     'text_wrap': True })
 arialbold = workbook.add_format({
                                     'font_name': 'Calibri',
