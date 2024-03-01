@@ -9,7 +9,9 @@ from alive_progress import alive_bar
 from alive_progress.styles import showtime, Show
 
 #Global Variables
-spreadsheetName = "SAR.for.compliance2.xlsx"
+spreadsheetName = "test.xlsx"
+# spreadsheetName = "Compliance_Windows_2010_Feb29_2024.xlsx"
+
 spreadsheetloc = str(os.getcwd()) + "/" + spreadsheetName
 workbook = xlsxwriter.Workbook(spreadsheetloc)
 
@@ -21,7 +23,7 @@ blackcell = workbook.add_format()
 blackcell.set_pattern(1)
 blackcell.set_bg_color('black')
 
-format_silver = workbook.add_format({'bg_color': 'silver',
+format_silver = workbook.add_format({'bg_color': '#C0D0D0',
                                     'font_name': 'Calibri',
                                     'font_size': 11,
                                     'bold': True,
@@ -149,62 +151,81 @@ def parse_txt(file):
 
     return content;
 
-def compute(total, failedItems):
+def compute(total, failedItems_df):
     df_cat = pd.DataFrame()
-
+    print("Processing CAT") 
     with alive_bar(total) as bar:  # your expected total
-        for index, row in failedItems.iterrows():
-            category_string = str(row['Cross References']).split("CAT #",1)[1].split(",")[0]
-            if(category_string == "I"):
+        for index, row in failedItems_df.iterrows():
+            try:
+                category_string = str(row['Cross References']).split("CAT #",1)[1].split(",")[0]
+                if(category_string == "I"):
                 # row.at[index,'Severity']='HIGH'
-                row.replace("High", 
-               "HIGH", 
-               inplace=True)
-            elif(category_string == "II"):
-                # row.at[,'Severity']='MEDIUM'
-                row.replace("High", 
-               "MEDIUM", 
-               inplace=True)
-                # row.loc[index,['Severity']] = 'MEDIUM'
-            else:
-                row.replace("High", 
-               "LOW", 
-               inplace=True)
-            df_cat = df_cat._append(row, ignore_index=True)
+                    row.replace(row['Severity'], "HIGH", inplace=True)
+                elif(category_string == "II"):
+                    # row.at[,'Severity']='MEDIUM'
+                    row.replace(row['Severity'], "MEDIUM", inplace=True)
+                    # row.loc[index,['Severity']] = 'MEDIUM'
+                else:
+                    row.replace(row['Severity'], "LOW", inplace=True)
+                df_cat = df_cat._append(row, ignore_index=True)
+            except:
+                row.replace(row['Severity'], "NA", inplace=True)
+                df_cat = df_cat._append(row, ignore_index=True)
+
             bar()  
     return df_cat
 
 def compute_config_path(total, failedItems):
     df_cat = pd.DataFrame()
-
     with alive_bar(total) as bar:  # your expected total
         for index, row in failedItems.iterrows():
             try:
-                category_string = str(row['Description']).split("CAT|",1)[1].split(",")[0]
-            except:
-                category_string = "NA"
-            if(category_string == "I"):
+                category_string = str(row['Cross References']).split("CAT|",1)[1].split(",")[0]
+                if(category_string == "I"):
                 # row.at[index,'Severity']='HIGH'
-                row.replace("FAILED", 
-               "HIGH", 
-               inplace=True)
-            elif(category_string == "II"):
-                # row.at[,'Severity']='MEDIUM'
-                row.replace("FAILED", 
-               "MEDIUM", 
-               inplace=True)
-                # row.loc[index,['Severity']] = 'MEDIUM'
-            elif(category_string == "III"):
-                row.replace("FAILED", 
-               "LOW", 
-               inplace=True)
-            else:
-                row.replace("FAILED", 
-               "NA", 
-               inplace=True)
-            df_cat = df_cat._append(row, ignore_index=True)
+                    row.replace(row['Risk'], "HIGH", inplace=True)
+                elif(category_string == "II"):
+                    # row.at[,'Severity']='MEDIUM'
+                    row.replace(row['Risk'], "MEDIUM", inplace=True)
+                    # row.loc[index,['Severity']] = 'MEDIUM'
+                else:
+                    row.replace(row['Risk'], "LOW", inplace=True)
+                df_cat = df_cat._append(row, ignore_index=True)
+            except:
+                row.replace(row['Risk'], "NA", inplace=True)
+                df_cat = df_cat._append(row, ignore_index=True)
+
             bar()  
     return df_cat
+    # df_cat = pd.DataFrame()
+    # with alive_bar(total) as bar:  # your expected total
+    #     for index, row in failedItems.iterrows():
+    #         try:
+    #             category_string = str(row['Description']).split("CAT|",1)[1].split(",")[0]
+    #         except:
+    #             category_string = "NA"
+    #         if(category_string == "I"):
+    #             # row.at[index,'Severity']='HIGH'
+    #             row.replace("FAILED", 
+    #            "HIGH", 
+    #            inplace=True)
+    #         elif(category_string == "II"):
+    #             # row.at[,'Severity']='MEDIUM'
+    #             row.replace("FAILED", 
+    #            "MEDIUM", 
+    #            inplace=True)
+    #             # row.loc[index,['Severity']] = 'MEDIUM'
+    #         elif(category_string == "III"):
+    #             row.replace("FAILED", 
+    #            "LOW", 
+    #            inplace=True)
+    #         else:
+    #             row.replace("FAILED", 
+    #            "NA", 
+    #            inplace=True)
+    #         df_cat = df_cat._append(row, ignore_index=True)
+    #         bar()  
+    # return df_cat
 
 def workbook_format(file_list_length):
     # Create xlxs document:
@@ -254,7 +275,7 @@ def worksheet_writer(worksheets, file_index, row, testcount, plugin_output):
 
     except:
         Vuln_ID_string = "NA"
-
+            
     try:
         plugin_description = str(plugin_output).split(str(row["Plugin"]),1)[1].split(str(Vuln_ID_string))[0] 
     except:
@@ -302,19 +323,22 @@ def worksheet_writer(worksheets, file_index, row, testcount, plugin_output):
 
     worksheets[file_index].write('A' + str(testcount), editedhosts, normaltext)
     worksheets[file_index].write('B' + str(testcount), "Nessus PluginID="+str(row['Plugin']), normaltext)
-    if( str(row['Severity']) == "HIGH"):
-        worksheets[file_index].write('C' + str(testcount), str(row['Severity']), format_red)
-    elif( str(row['Severity']) == "MEDIUM"):
-        worksheets[file_index].write('C' + str(testcount), str(row['Severity']), format_orange)
-    else:
-        worksheets[file_index].write('C' + str(testcount), str(row['Severity']), format_yellow)
+    worksheets[file_index].write('C' + str(testcount), str(row['Severity']), normaltext)
+
     worksheets[file_index].write('D' + str(testcount), Finding_Description_string, normaltext)
     worksheets[file_index].write('E' + str(testcount), Information_string,normaltext)
     worksheets[file_index].write_rich_string('F' + str(testcount), 
         normalBOLDtext, "Recommendation:\n", normaltext, Solution_Val_string, normalBOLDtext)
-    worksheets[file_index].write_rich_string('G' + str(testcount),  
-        normalBOLDtext, "'DISCLAIMER: This is an example output, please refer to Nessus Security Center for Actual Value information”\n", 
-        normaltext, Actual_Val_string[:250] + "... Please refer to Nessus (Full Output) column.", normalBOLDtext)
+    if len(Actual_Val_string) > 250:
+
+        worksheets[file_index].write_rich_string('G' + str(testcount),  
+        normaltext, Actual_Val_string[:250] + "... Please refer to Nessus (Full Output) column.", normalBOLDtext,
+         "\n\n\n\n\n\nDISCLAIMER: This is an example output, please refer to Nessus Security Center for Actual Value information”\n", normalBOLDtext)
+    else:
+        worksheets[file_index].write_rich_string('G' + str(testcount),  
+        normaltext, Actual_Val_string, normalBOLDtext,
+         "\n\n\n\n\n\nDISCLAIMER: This is an example output, please refer to Nessus Security Center for Actual Value information”\n", normalBOLDtext)
+
     worksheets[file_index].write('H' + str(testcount), 5.14, blackcell)
     worksheets[file_index].write('I' + str(testcount), Policy_Val_string, normaltext )
     worksheets[file_index].write('J' + str(testcount), Vuln_ID_string, normaltext )
@@ -389,8 +413,8 @@ def worksheet_writer_config_path(worksheets, file_index, row, testcount):
     worksheets[file_index].write_rich_string('F' + str(testcount), 
         normalBOLDtext, "Recommendation:", normaltext, Solution_Val_string, normalBOLDtext)
     worksheets[file_index].write_rich_string('G' + str(testcount),  
-        normalBOLDtext, "'DISCLAIMER: This is an example output, please refer to Nessus Security Center for Actual Value information”\n", 
-        normaltext, Actual_Val_string[:250] + "... Please refer to Nessus (Full Output) column.", normalBOLDtext)
+        normaltext, Actual_Val_string[:250] + "... Please refer to Nessus (Full Output) column.", normalBOLDtext,
+         "\n\n\n\n\n\nDISCLAIMER: This is an example output, please refer to Nessus Security Center for Actual Value information”\n", normalBOLDtext)
     worksheets[file_index].write('H' + str(testcount), 5.14, blackcell)
     worksheets[file_index].write('I' + str(testcount), Policy_Val_string, normaltext )
     worksheets[file_index].write('J' + str(testcount), Vuln_ID_string, normaltext )
@@ -399,6 +423,30 @@ def worksheet_writer_config_path(worksheets, file_index, row, testcount):
         normalBOLDtext)
     worksheets[file_index].write('L' + str(testcount), str(row['Description']), normaltext )
     return testcount
+
+def get_failed_results(df, plugin_output):
+    failed_items = pd.DataFrame()
+    print("Proccessing Failed Results")
+    with alive_bar(len(df)) as bar: 
+        for index, row in df.iterrows():
+            try:
+                Vuln_ID_string = str(row['Cross References']).split("Vuln-ID #",1)[1].split(",")[0]
+
+            except:
+                Vuln_ID_string = "NA"
+
+            try:
+                search_string =  str(row["IP Address"] + "," + str(row["Plugin"]) + "," + str(row["Severity"]) )
+                #plugin_description = str(plugin_output).split(str(row["Plugin"]),1)[1].split(str(Vuln_ID_string))[0] 
+                plugin_description = str(plugin_output).split(search_string,1)[1].split(str(Vuln_ID_string))[0] 
+            except:
+                plugin_description = "NA"
+
+            if "Result: FAILED" in plugin_description:
+                
+                failed_items = failed_items._append(row, ignore_index=True)
+            bar()
+    return failed_items
 
 def get_compliance(file,file_txt, dir_path, file_index, worksheets):
     #Variables
@@ -411,115 +459,51 @@ def get_compliance(file,file_txt, dir_path, file_index, worksheets):
     #read in plugin output into file
     plugin_output = parse_txt(file_txt)
 
-
-    # This is set for Nessus Pro (FAILED), in SC its "High" instead of FAILED - need to add SC support
-    failedItems = df[df['Severity'] == 'High']
-    # failedItems['DescriptionGroup'] = failedItems['Cross References']#.str.extract(r'"(.*?)"')
+    #drop severity of type "info"
+    df_noInfo = df[df.Severity != 'Info']
+   
+    #Grab failed results only
+    failed_items = get_failed_results(df_noInfo, plugin_output)
+    
+    #join IP addresses
     try:
-        failedItems['IP Address'] = failedItems.groupby('Cross References')['IP Address'].transform(lambda x: ','.join(x.unique()))
+        failed_items['IP Address'] = failed_items.groupby('Cross References')['IP Address'].transform(lambda x: ','.join(x.unique()))
     except:
         print(f"Failed to parse file: {str(file)}")
 
-    failedItems = failedItems.drop_duplicates(subset='Plugin')
+
+    #Drop duplicate plugins
+    df_combined_drop = failed_items.drop_duplicates(subset='Plugin')
 
 
-    #update severity field based on value
-    df_cat=compute(len(failedItems), failedItems)
+    #Compute CAT
+    failed_items=compute(len(df_combined_drop), df_combined_drop)
+    failed_items.to_csv('output2.csv', mode='a', index=False, header=True)
 
-    #sort dataframe by severity 
+
+    #Filter out NA (SC will not have full infomration for result error)
+    df_noNA = failed_items[failed_items.Severity != 'NA']
+
+    #Sort DF
     custom_dict = {'HIGH': 0, 'MEDIUM': 1, 'LOW': 2}
-    df_sorted = df_cat.sort_values(by=['Severity'], key=lambda x: x.map(custom_dict))
-        
+    df_sorted = df_noNA.sort_values(by=['Severity'], key=lambda x: x.map(custom_dict))
 
+    #used for debugging
+    # df_sorted.to_csv('output3.csv', mode='a', index=False, header=True)
+    # print("----------------------")
+    # print(df_sorted)
+    # print("----------------------")
 
-    testcount = 1
+    #output to worksheets
+    testcount = 1  
+    print("Writing to worksheets")  
     with alive_bar(len(df_sorted)) as bar: 
         for index, row in df_sorted.iterrows():
-        #################################
-            # compute(len(df_sorted))
-            
-            # testcount = testcount + 1
-            # # betterdes = str(row['Cross References']).split('\n')[0]
-
-            # #seperate out data
-            # try:
-            #     Vuln_ID_string = str(row['Cross References']).split("Vuln-ID #",1)[1].split(",")[0]
-
-            # except:
-            #     Vuln_ID_string = "NA"
-
-            # try:
-            #     plugin_description = str(plugin_output).split(str(row["Plugin"]),1)[1].split(str(Vuln_ID_string))[0] 
-            # except:
-            #     plugin_description = "NA"
-
-            # try:
-            #     Solution_Val_string = str(plugin_description).split("Solution:",1)[1].split("See Also:")[0]
-            # except:
-            #     Solution_Val_string = "NA"
-
-            # try:
-            #     Actual_Val_string = str(plugin_description).split("Actual Value:",1)[1].split("Policy Value:")[0]
-            # except:
-            #     Actual_Val_string = "NA"
-
-            # try:
-            #     Policy_Val_string = str(plugin_description).split("Policy Value:",1)[1].split("Solution")[0]
-            # except:
-            #     Policy_Val_string = "NA"
-            
-            # try:
-            #     Finding_Description_string = str(plugin_description).split(" - ",1)[1].split("Information:")[0] 
-            # except:
-            #     Finding_Description_string = "NA"
-
-            # try:
-            #     STIG_ref_string = str(plugin_description).split("/zip/",1)[1].split(".zip")[0]
-            # except:
-            #     STIG_ref_string = "NA"  
-
-            # try:
-            #     Information_string = str(plugin_description).split("Information: ",1)[1].split("Result: ")[0]
-            # except:
-            #     Information_string = "NA"  
-            # #hard code stig name
-            # STIG_Guideline = "NA"
-            # if "RHEL" in STIG_ref_string: 
-            #     STIG_Guideline = "Red Hat Enterprise Linux 8 Security Technical Implmentation Guide"
-            # elif "Windows_10" in STIG_ref_string:
-            #     STIG_Guideline = "Windows 10 Security Technical Implement Guide"
-            # elif "Windows_Server_2019" in STIG_ref_string:
-            #     STIG_Guideline = "Microsoft Windows Server 2019 Security Technical Implementation Guide"
-            # editedhosts = str(row['IP Address']).replace(',','\n')
 
             #write to Excel doc
-
             testcount = worksheet_writer(worksheets, file_index, row, testcount, plugin_output)
-            # worksheets[file_index].write('A' + str(testcount), editedhosts, normaltext)
-            # worksheets[file_index].write('B' + str(testcount), "Nessus PluginID="+str(row['Plugin']), normaltext)
-            # if( str(row['Severity']) == "HIGH"):
-            #     worksheets[file_index].write('C' + str(testcount), str(row['Severity']), format_red)
-            # elif( str(row['Severity']) == "MEDIUM"):
-            #     worksheets[file_index].write('C' + str(testcount), str(row['Severity']), format_orange)
-            # else:
-            #     worksheets[file_index].write('C' + str(testcount), str(row['Severity']), format_yellow)
-            # worksheets[file_index].write('D' + str(testcount), Finding_Description_string, normaltext)
-            # worksheets[file_index].write('E' + str(testcount), Information_string,normaltext)
-            # worksheets[file_index].write_rich_string('F' + str(testcount), 
-            #     normalBOLDtext, "Recommendation:\n", normaltext, Solution_Val_string, normalBOLDtext)
-            # worksheets[file_index].write_rich_string('G' + str(testcount),  
-            #     normalBOLDtext, "'DISCLAIMER: This is an example output, please refer to Nessus Security Center for Actual Value information”\n", 
-            #     normaltext, Actual_Val_string[:250] + "... Please refer to Nessus (Full Output) column.", normalBOLDtext)
-            # worksheets[file_index].write('H' + str(testcount), 5.14, blackcell)
-            # worksheets[file_index].write('I' + str(testcount), Policy_Val_string, normaltext )
-            # worksheets[file_index].write('J' + str(testcount), Vuln_ID_string, normaltext )
-            # worksheets[file_index].write_rich_string('K' + str(testcount), normalBOLDtext, 'STIG Policy Guideline: ', normaltext, STIG_Guideline,
-            #     normalBOLDtext, '\nSTIG-USED: ', normaltext, STIG_ref_string, 
-            #     normalBOLDtext)
-            # worksheets[file_index].write('L' + str(testcount), str(row['Plugin']) + plugin_description + "\n"+ row["Cross References"], normaltext )
             bar()
     
-
 def get_compliance_config_path(file, dir_path, file_index, worksheets):
 
     ########## pandas stuff - actual sorting: #########
@@ -546,6 +530,7 @@ def get_compliance_config_path(file, dir_path, file_index, worksheets):
         
 
     testcount = 1
+    print("Writing to worksheets") 
     with alive_bar(len(df_sorted)) as bar: 
         for index, row in df_sorted.iterrows():
         #################################
