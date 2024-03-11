@@ -18,26 +18,26 @@ pip install pandas
 pip install alive-progress
 
 ## Wish List (Shortterm)
--Don’t auto fit Column L (too long)
+-Don’t auto fit Column L (too long)   (Both Vuln+Comp)
 
--Change column(M) header from "Comments" to "SSS Comments"
+-Change column(M) header from "Comments" to "SSS Comments" (Both Vuln+Comp)
 
--Add new column (N) header as "INL Comments"
+-Add new column (N) header as "INL Comments" (Both Vuln+Comp)
 
--autofilter for top row
+-autofilter for top row (Both Vuln+Comp)
 
--freeze top row
+-freeze top row (Both Vuln+Comp)
 
 ## Wish List (Longterm)
--change hardcoded output to dynamic DATE format.
+-change hardcoded output to dynamic DATE format. (Both Vuln+Comp)
 
 -incorporate blacklist into autotravis compliance?
 	New Column(N) with top row set to "DHS Requirements".   Set value to "Required" if no match.  And set value to "Optional - DHS Blacklist" if matches blacklist V-#####
  
--incorporate "last seen" 
+-incorporate "last seen"  (Both Vuln+Comp)
    subtract first seen -> last seen   (bug, defender updates) (bug, IP’s differ)
    
--incorporate SSS & INL comments through a lookup
+-incorporate SSS & INL comments through a lookup  (Both Vuln+Comp)
 
--may be asked to move from github.com to TEN private GIT
+-may be asked to move from github.com to TEN private GIT  (Both Vuln+Comp)
 
