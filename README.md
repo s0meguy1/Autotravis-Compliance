@@ -12,9 +12,21 @@ The tool then outputs to one file, SAR.for.travis.compliance.xls
 
 ## Dependencies
 pip install XlsxWriter
-
 pip install pandas
+pip install alive-progress
 
+## Wish List (Shortterm)
+-Don’t auto fit Column L (too long)
+-Change column(M) header from "Comments" to "SSS Comments"
+-Add new column (N) header as "INL Comments"
+-autofilter for top row
+-freeze top row
 
-## But why?
-Our boss would get constantly changing requirements from the client, which would force us to spend hours re-analyzing the data and re-formatting. This makes it possible in seconds
+## Wish List (Longterm)
+-incorporate blacklist into autotravis compliance?
+	New Column(N) with top row set to "DHS Requirements".   Set value to "Required" if no match.  And set value to "Optional - DHS Blacklist" if matches blacklist V-#####
+-incorporate "last seen" 
+   subtract first seen -> last seen   (bug, defender updates) (bug, IP’s differ)
+-incorporate SSS & INL comments through a lookup
+-may be asked to move from github.com to TEN private GIT
+
