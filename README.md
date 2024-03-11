@@ -29,6 +29,8 @@ pip install alive-progress
 -freeze top row
 
 ## Wish List (Longterm)
+-change hardcoded output to dynamic DATE format.
+
 -incorporate blacklist into autotravis compliance?
 	New Column(N) with top row set to "DHS Requirements".   Set value to "Required" if no match.  And set value to "Optional - DHS Blacklist" if matches blacklist V-#####
  
